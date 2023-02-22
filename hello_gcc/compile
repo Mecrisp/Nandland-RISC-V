@@ -1,0 +1,15 @@
+#!/bin/sh
+
+riscv64-unknown-elf-gcc -Os -fno-strict-aliasing -ffreestanding -fno-pic -fomit-frame-pointer -march=rv32i -mabi=ilp32 -fno-stack-protector -fdata-sections -ffunction-sections -nostartfiles -nostdlib -c start.S  -o start.o
+riscv64-unknown-elf-gcc -Os -fno-strict-aliasing -ffreestanding -fno-pic -fomit-frame-pointer -march=rv32i -mabi=ilp32 -fno-stack-protector -fdata-sections -ffunction-sections -nostartfiles -nostdlib -c hello_gcc.c -o hello_gcc.o
+riscv64-unknown-elf-gcc -Os -fno-strict-aliasing -ffreestanding -fno-pic -fomit-frame-pointer -march=rv32i -mabi=ilp32 -fno-stack-protector -fdata-sections -ffunction-sections -nostartfiles -nostdlib -Wl,-T,memmap,--gc-sections *.o -o hello_gcc.elf -lgcc
+
+riscv64-unknown-elf-objdump -Mnumeric -D hello_gcc.elf > hello_gcc.list
+riscv64-unknown-elf-objcopy hello_gcc.elf hello_gcc.bin -O binary
+
+riscv64-unknown-elf-objdump -Mnumeric -D -mriscv:rv32 --target binary hello_gcc.bin --adjust-vma=0x00000000 > hello_gcc.dis
+
+ls -l *.bin
+md5sum *.bin
+
+hexdump -ve '1/4 "%08X\n"' hello_gcc.bin > hello_gcc.hex

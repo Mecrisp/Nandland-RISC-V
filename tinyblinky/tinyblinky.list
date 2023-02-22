@@ -1,0 +1,28 @@
+
+tinyblinky.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00000000 <Reset>:
+   0:	00004437          	lui	x8,0x4
+   4:	00440413          	addi	x8,x8,4 # 4004 <breathe_led+0x3ff4>
+   8:	00100513          	li	x10,1
+   c:	01351593          	slli	x11,x10,0x13
+
+00000010 <breathe_led>:
+  10:	41155613          	srai	x12,x10,0x11
+  14:	40c585b3          	sub	x11,x11,x12
+  18:	4115d613          	srai	x12,x11,0x11
+  1c:	00c50533          	add	x10,x10,x12
+  20:	40e5d613          	srai	x12,x11,0xe
+  24:	0b460613          	addi	x12,x12,180
+  28:	00767693          	andi	x13,x12,7
+  2c:	00868693          	addi	x13,x13,8
+  30:	00365613          	srli	x12,x12,0x3
+  34:	00c696b3          	sll	x13,x13,x12
+  38:	00d484b3          	add	x9,x9,x13
+  3c:	00d4b6b3          	sltu	x13,x9,x13
+  40:	40d006b3          	neg	x13,x13
+  44:	00d42023          	sw	x13,0(x8)
+  48:	fc9ff06f          	j	10 <breathe_led>
