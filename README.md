@@ -142,4 +142,6 @@ For the ones that prefer reading and want to know everything to design their own
 For the ones that prefer videos and a calm pace, Shawn Hymel has done a series in 12 parts that really starts at the beginning and explains the scenery you encounter:
 
 [https://github.com/ShawnHymel/introduction-to-fpga](https://github.com/ShawnHymel/introduction-to-fpga)
-[https://www.digikey.de/en/maker/projects/introduction-to-fpga-part-1-what-is-an-fpga/3ee5f6c8fa594161a655a9f960060893](https://github.com/ShawnHymel/introduction-to-fpga)
+
+
+[https://www.digikey.de/en/maker/projects/introduction-to-fpga-part-1-what-is-an-fpga/3ee5f6c8fa594161a655a9f960060893](https://www.digikey.de/en/maker/projects/introduction-to-fpga-part-1-what-is-an-fpga/3ee5f6c8fa594161a655a9f960060893)
