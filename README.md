@@ -6,6 +6,7 @@ This projects contains an example for a simple RISC-V RV32I microcontroller
 based on the FemtoRV32-Quark written by Bruno Levy and Matthias Koch:
 
 [https://github.com/BrunoLevy/learn-fpga/](https://github.com/BrunoLevy/learn-fpga/)
+
 [https://github.com/BrunoLevy/learn-fpga/blob/master/FemtoRV/RTL/PROCESSOR/femtorv32_quark.v](https://github.com/BrunoLevy/learn-fpga/blob/master/FemtoRV/RTL/PROCESSOR/femtorv32_quark.v)
 
 Peripherals included for default:
@@ -35,14 +36,14 @@ Both character and font data areas can be read and written using byte access onl
 
 The IO registers with base 0x4000 are word addressable.
 
-0x4004: RW  [17:14] Four LEDs [13:7] Left segment digit [6:0] Right segment digit
+* 0x4004: RW  [17:14] Four LEDs [13:7] Left segment digit [6:0] Right segment digit
 
-0x4008: RW  Serial terminal. Write: Send character [7:0]. Read: Received character [7:0] and flags.
-0x4010: RO  For reading flags [10] Random [9] Busy [8] Valid without removing character [7:0] from receive FIFO.
+* 0x4008: RW  Serial terminal. Write: Send character [7:0]. Read: Received character [7:0] and flags.
+* 0x4010: RO  For reading flags [10] Random [9] Busy [8] Valid without removing character [7:0] from receive FIFO.
 
-0x4020: RO  [7:0] PMOD IN   [11:8] Buttons
-0x4040: RW  [7:0] PMOD OUT
-0x4080: RW  [7:0] PMOD DIR
+* 0x4020: RO  [7:0] PMOD IN   [11:8] Buttons
+* 0x4040: RW  [7:0] PMOD OUT
+* 0x4080: RW  [7:0] PMOD DIR
 
 Bits [13:2] are one-hot decoded. Every register has its own bit, which simplifies
 the decoding logic, and also allows to set multiple registers at once.
