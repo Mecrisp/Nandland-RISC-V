@@ -96,7 +96,7 @@ uint32_t random(void)
 // Arrays for font data and characters
 
 volatile uint8_t *characters = (volatile uint8_t*) 0x8000;
-volatile uint8_t *font       = (volatile uint8_t*) 0xC000;
+volatile uint8_t *font       = (volatile uint8_t*) 0x8A00;
 
 static uint32_t xpos = 0;
 static uint32_t ypos = 0;
@@ -244,15 +244,18 @@ void main(void)
   normal();
   putchar(10);
 
-  // A little bit of artwork - does not fit in RAM together with the terminal...
-  // while (1)
-  // {
-  //   characters[((random() & 15) + 7) * 80 + (random() & 63) + 8] = (random() & 0x80) | (random() & 1 ? 0x2F : 0x5C);
-  //   ms(10);
-  // }
+  // A little bit of artwork
+
+  while (~keypressed())
+  {
+    characters[((random() & 15) + 7) * 80 + (random() & 63) + 8] = (random() & 0x80) | (random() & 1 ? 0x2F : 0x5C);
+    ms(10);
+  }
+
+  for (uint32_t pos = 4*80; pos < 30*80; pos++) characters[pos] = 32;
 
   // Print font data...
-  // for (uint32_t pos = 0; pos < 2048; pos++)
+  // for (uint32_t pos = 0; pos < 1536; pos++)
   // {
   //   print_hex_byte(font[pos]);
   //   putchar(10);

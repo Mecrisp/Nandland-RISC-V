@@ -16,21 +16,24 @@ Peripherals included for default:
   - GPIO registers for PMOD pin access
   - Buttons, LEDs and two digit seven segment display
   - UART terminal, 115200 Baud 8N1
-  - 1 kb initialised RAM
+  - 2 kb initialised RAM
 
 Memory map and IO
 ---------------------
 
 Memory areas are selected using bits [15:14].
 
-0x0000 - 0x03FF: 1 kb initialised RAM for firmware
-0x4000 - 0x7FFF: Peripheral IO registers
-0x8000 - 0x89FF: 2560 bytes character buffer, 80x30=2400 chars visible, byte access only
-0xC000 - 0xC7FF: 2048 bytes font data, 128 characters, 16 bytes per character, byte access only
+* 0x0000 - 0x07FF: 2 kb initialised RAM for firmware
+* 0x4000 - 0x7FFF: Peripheral IO registers
+* 0x8000 - 0x89FF: 2560 bytes character buffer, 80x30=2400 chars visible, byte access only
+* 0x8A00 - 0x8FFF: 1536 bytes font data, 96 characters, 16 bytes per character, byte access only
 
 For using the display, all you have is to write characters into the 2400 bytes starting
-at 0x8000. The font (starting at 0xC000) contains 128 glyphs, taken from FreeBSD "iso-8x16"
+at 0x8000. The font (starting at 0x8A00) contains 96 glyphs (32 to 127), taken from FreeBSD "iso-8x16"
 bitmap font. The MSB (0x80) selects a "highlight" color.
+
+The ten glyphs for ASCII 22 to 31 are in the invisible part of the character memory area
+from 0x8960 (=80*30+0x8000) to 0x89FF and can be freely used for custom characters.
 
 Both character and font data areas can be read and written using byte access only.
 

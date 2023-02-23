@@ -148,47 +148,41 @@ module top(input oscillator,
                        bitmap_shift[7] ? colorswitch ? 9'b000_111_111 :  9'b111_101_000 : 9'b000_000_011;
    end
 
-   reg [7:0] characters [2559:0]; // [2399:0] is sufficient for 80x30, but RAM blocks come in 512 bytes...
-   reg [7:0]       font [2047:0]; initial $readmemh("font-vga.hex", font);
+   // Combined memory for characters and font data
+   reg [7:0] characters [3*512 + 2559:0]; initial $readmemh("font-vga.hex", characters, 2560);
 
    reg [7:0] char, bitmap, bitmap_shift;
    reg [3:0] fontrow, fontrow_delay;
    reg colorswitch, colorswitch_delay;
 
-   wire [11:0] characterindex = xpos[2:0] == 3'b000 ? xpos[9:3] + 80 * ypos[9:4] : mem_address[11:0];
-   wire [10:0]      fontindex = xpos[2:0] == 3'b001 ? {char[6:0], fontrow}       : mem_address[10:0];
+   wire [12:0] characterindex = xpos[2:0] == 3'b000 ? xpos[9:3] + 80 * ypos[9:4] :
+                                xpos[2:0] == 3'b001 ? {char[6:0], fontrow}  + 12'd2560 - 12'd32*16 :
+                                mem_address[12:0];
 
    always @(posedge clk) // Pixel pipeline.
    begin
-      // First cycle:
-      char    <= characters[ characterindex ]; // 7-Bit ASCII. Using char[7] for highlight color.
-      fontrow <= ypos[3:0];
+      // First & second cycle:
+      char    <= characters[ characterindex ]; // First  cycle: 7-Bit ASCII. Using char[7] for highlight color.
+      fontrow <= ypos[3:0];                    // Second cycle: 8x16 pixel font bitmap data.
 
       // Second cycle:
-      bitmap            <= font[ fontindex ]; // 8x16 pixel font bitmap data.
       colorswitch_delay <= char[7];
 
       // Third cycle:
-      if (xpos[2:0] == 3'b010) begin bitmap_shift <= bitmap; colorswitch <= colorswitch_delay; end
+      if (xpos[2:0] == 3'b010) begin bitmap_shift <= char; colorswitch <= colorswitch_delay; end
       else                     begin bitmap_shift <= {bitmap_shift[6:0], 1'b0}; end
    end
 
    // This is a little trick to coax a word-addressed CPU into byte aligned reads and writes:
 
-   wire [31:0] char_rdata = {  char,   char,   char,   char};
-   wire [31:0] font_rdata = {bitmap, bitmap, bitmap, bitmap};
+   wire [31:0] char_rdata = {char, char, char, char};
 
    always @(posedge clk) begin
 
-      if(mem_wmask[0] & mem_address_is_char) characters[mem_address[11:0]] <= mem_wdata[ 7:0 ];
-      if(mem_wmask[1] & mem_address_is_char) characters[mem_address[11:0]] <= mem_wdata[15:8 ];
-      if(mem_wmask[2] & mem_address_is_char) characters[mem_address[11:0]] <= mem_wdata[23:16];
-      if(mem_wmask[3] & mem_address_is_char) characters[mem_address[11:0]] <= mem_wdata[31:24];
-
-      if(mem_wmask[0] & mem_address_is_font)       font[mem_address[10:0]] <= mem_wdata[ 7:0 ];
-      if(mem_wmask[1] & mem_address_is_font)       font[mem_address[10:0]] <= mem_wdata[15:8 ];
-      if(mem_wmask[2] & mem_address_is_font)       font[mem_address[10:0]] <= mem_wdata[23:16];
-      if(mem_wmask[3] & mem_address_is_font)       font[mem_address[10:0]] <= mem_wdata[31:24];
+      if(mem_wmask[0] & mem_address_is_char) characters[mem_address[12:0]] <= mem_wdata[ 7:0 ];
+      if(mem_wmask[1] & mem_address_is_char) characters[mem_address[12:0]] <= mem_wdata[15:8 ];
+      if(mem_wmask[2] & mem_address_is_char) characters[mem_address[12:0]] <= mem_wdata[23:16];
+      if(mem_wmask[3] & mem_address_is_char) characters[mem_address[12:0]] <= mem_wdata[31:24];
 
    end
 
@@ -273,7 +267,6 @@ module top(input oscillator,
    //   mem_address[15:14] 00: RAM              (starts at 0x0000)
    //                      01: IO page (1-hot)  (starts at 0x4000)
    //                      10: Characters       (starts at 0x8000)
-   //                      11: Font             (starts at 0xC000)
 
    wire [31:0] mem_address; // 16 bits are used internally. The two LSBs are usually ignored for word addresses
    wire  [3:0] mem_wmask;   // mem write mask and strobe /write Legal values are 000,0001,0010,0100,1000,0011,1100,1111
@@ -302,7 +295,7 @@ module top(input oscillator,
      .reset(resetq)
    );
 
-   // Wait for character or font data read being possible.
+   // Wait for character data read being possible.
    // This is just the smallest possible logic that works, not the fastest.
 
    assign mem_rbusy = mem_address[15] & (xpos[2:0] != 3'b011);
@@ -314,12 +307,11 @@ module top(input oscillator,
 
    wire mem_wstrb = |mem_wmask; // mem write strobe, goes high to initiate memory write (deduced from wmask)
 
-   // RAM, IO, characters or font?
+   // RAM, IO or characters?
 
    wire mem_address_is_ram       = (mem_address[15:14] == 2'b00);
    wire mem_address_is_io        = (mem_address[15:14] == 2'b01);
    wire mem_address_is_char      = (mem_address[15:14] == 2'b10);
-   wire mem_address_is_font      = (mem_address[15:14] == 2'b11);
 
    wire io_rstrb = mem_rstrb & mem_address_is_io;
    wire io_wstrb = mem_wstrb & mem_address_is_io;
@@ -328,19 +320,19 @@ module top(input oscillator,
    // RAM.
    /***************************************************************************/
 
-   reg  [31:0] RAM[(1*1024/4)-1:0]; // Choose your firmware here:
+   reg  [31:0] RAM[(2*1024/4)-1:0]; // Choose your firmware here:
    // initial $readmemh("../tinyblinky/tinyblinky.hex", RAM);
       initial $readmemh("../hello_gcc/hello_gcc.hex",   RAM);
    reg  [31:0] ram_rdata;
 
    always @(posedge clk) begin
 
-     if(mem_wmask[0] & mem_address_is_ram) RAM[mem_address[9:2]][ 7:0 ] <= mem_wdata[ 7:0 ];
-     if(mem_wmask[1] & mem_address_is_ram) RAM[mem_address[9:2]][15:8 ] <= mem_wdata[15:8 ];
-     if(mem_wmask[2] & mem_address_is_ram) RAM[mem_address[9:2]][23:16] <= mem_wdata[23:16];
-     if(mem_wmask[3] & mem_address_is_ram) RAM[mem_address[9:2]][31:24] <= mem_wdata[31:24];
+     if(mem_wmask[0] & mem_address_is_ram) RAM[mem_address[10:2]][ 7:0 ] <= mem_wdata[ 7:0 ];
+     if(mem_wmask[1] & mem_address_is_ram) RAM[mem_address[10:2]][15:8 ] <= mem_wdata[15:8 ];
+     if(mem_wmask[2] & mem_address_is_ram) RAM[mem_address[10:2]][23:16] <= mem_wdata[23:16];
+     if(mem_wmask[3] & mem_address_is_ram) RAM[mem_address[10:2]][31:24] <= mem_wdata[31:24];
 
-     ram_rdata <= RAM[mem_address[9:2]];
+     ram_rdata <= RAM[mem_address[10:2]];
    end
 
    /***************************************************************************/
@@ -351,7 +343,6 @@ module top(input oscillator,
 
       (mem_address_is_ram       ? ram_rdata              : 32'd0) |
       (mem_address_is_io        ? io_rdata_buffered      : 32'd0) |
-      (mem_address_is_char      ? char_rdata             : 32'd0) |
-      (mem_address_is_font      ? font_rdata             : 32'd0) ;
+      (mem_address_is_char      ? char_rdata             : 32'd0) ;
 
 endmodule // top

@@ -35,7 +35,7 @@ loop_init_bss:
 end_init_bss:
 
    # Set stack pointer to end of heap
-   li sp, 0x0400
+   li sp, 0x0800
 
    # Call main
    call main
