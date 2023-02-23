@@ -113,7 +113,7 @@ module top(input oscillator,
 
    wire [9:0] xpos;
    wire [9:0] ypos;
-   wire vga_blank, xblank, yblank, vga_enable, hsync, vsync;
+   wire vga_enable, hsync, vsync;
 
    simple_480p syncgenerator (clk, ~resetq, xpos, ypos, hsync, vsync, vga_enable);
 
@@ -151,8 +151,8 @@ module top(input oscillator,
    // Combined memory for characters and font data
    reg [7:0] characters [3*512 + 2559:0]; initial $readmemh("font-vga.hex", characters, 2560);
 
-   reg [7:0] char, bitmap, bitmap_shift;
-   reg [3:0] fontrow, fontrow_delay;
+   reg [7:0] char, bitmap_shift;
+   reg [3:0] fontrow;
    reg colorswitch, colorswitch_delay;
 
    wire [12:0] characterindex = xpos[2:0] == 3'b000 ? xpos[9:3] + 80 * ypos[9:4] :
@@ -177,14 +177,8 @@ module top(input oscillator,
 
    wire [31:0] char_rdata = {char, char, char, char};
 
-   always @(posedge clk) begin
-
-      if(mem_wmask[0] & mem_address_is_char) characters[mem_address[12:0]] <= mem_wdata[ 7:0 ];
-      if(mem_wmask[1] & mem_address_is_char) characters[mem_address[12:0]] <= mem_wdata[15:8 ];
-      if(mem_wmask[2] & mem_address_is_char) characters[mem_address[12:0]] <= mem_wdata[23:16];
-      if(mem_wmask[3] & mem_address_is_char) characters[mem_address[12:0]] <= mem_wdata[31:24];
-
-   end
+   always @(posedge clk)
+      if(mem_wstrb & mem_address_is_char) characters[mem_address[12:0]] <= mem_wdata[7:0];
 
    /***************************************************************************/
    // UART.
