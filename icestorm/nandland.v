@@ -152,18 +152,17 @@ module top(input oscillator,
    reg [7:0] characters [3*512 + 2559:0]; initial $readmemh("font-vga.hex", characters, 2560);
 
    reg [7:0] char, bitmap_shift;
-   reg [3:0] fontrow;
    reg colorswitch, colorswitch_delay;
 
    wire [12:0] characterindex = xpos[2:0] == 3'b000 ? xpos[9:3] + 80 * ypos[9:4] :
-                                xpos[2:0] == 3'b001 ? {char[6:0], fontrow}  + 12'd2560 - 12'd32*16 :
+                                xpos[2:0] == 3'b001 ? {char[6:0], ypos[3:0]}  + 12'd2560 - 12'd32*16 :
                                 mem_address[12:0];
 
    always @(posedge clk) // Pixel pipeline.
    begin
       // First & second cycle:
-      char    <= characters[ characterindex ]; // First  cycle: 7-Bit ASCII. Using char[7] for highlight color.
-      fontrow <= ypos[3:0];                    // Second cycle: 8x16 pixel font bitmap data.
+      char    <= characters[ characterindex ]; // First cycle: 7-Bit ASCII. Using char[7] for highlight color.
+                                              // Second cycle: 8x16 pixel font bitmap data.
 
       // Second cycle:
       colorswitch_delay <= char[7];
