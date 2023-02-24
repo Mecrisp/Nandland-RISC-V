@@ -79,20 +79,20 @@ module buart (
                    recv_divcnt <= 0;
                end
                1: begin
-                   if (2*recv_divcnt > divider) begin
+                   if (2*recv_divcnt == divider+1) begin
                        recv_state <= 2;
                        recv_divcnt <= 0;
                    end
                end
                10: begin
-                   if (recv_divcnt > divider) begin
+                   if (recv_divcnt == divider+1) begin
                        recv_buf_data <= recv_pattern;
                        recv_buf_valid <= 1;
                        recv_state <= 0;
                    end
                end
                default: begin
-                   if (recv_divcnt > divider) begin
+                   if (recv_divcnt == divider+1) begin
                        recv_pattern <= {rx, recv_pattern[7:1]};
                        recv_state <= recv_state + 1;
                        recv_divcnt <= 0;
@@ -131,7 +131,7 @@ module buart (
                send_bitcnt <= 10;
                send_divcnt <= 0;
            end else
-           if (send_divcnt > divider && send_bitcnt) begin
+           if (send_divcnt == divider+1 && send_bitcnt) begin
                send_pattern <= {1'b1, send_pattern[9:1]};
                send_bitcnt <= send_bitcnt - 1;
                send_divcnt <= 0;
