@@ -15,7 +15,7 @@ Memory areas are selected using bits [15:14].
 
 * 0x0000 - 0x03FF: 1 kb initialised RAM for firmware
 * 0x4000 - 0x7FFF: Peripheral IO registers
-* 0x8000 - 0x8E0F: 2560 bytes character buffer, 100x36=2400 chars visible, byte access only
+* 0x8000 - 0x8E0F: 3600 bytes character buffer, 100x36=3600 chars visible, byte access only
 * 0x8E10 - 0x93FF: 1520 bytes font data, 95 characters, 16 bytes per character, byte access only
 
 For using the display, all you have is to write characters into the 3600 bytes starting
