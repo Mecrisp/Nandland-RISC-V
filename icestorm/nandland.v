@@ -314,8 +314,8 @@ module top(input oscillator,
    /***************************************************************************/
 
    reg  [31:0] RAM[(2*1024/4)-1:0]; // Choose your firmware here:
-   // initial $readmemh("../tinyblinky/tinyblinky.hex", RAM);
-      initial $readmemh("../hello_gcc/hello_gcc.hex",   RAM);
+   // initial $readmemh("tinyblinky.hex", RAM);
+      initial $readmemh("hello_gcc.hex",  RAM);
    reg  [31:0] ram_rdata;
 
    always @(posedge clk) begin
