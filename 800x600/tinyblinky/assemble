@@ -1,0 +1,11 @@
+#!/bin/sh
+
+riscv64-linux-gnu-as tinyblinky.s -o tinyblinky.o -march=rv32i
+riscv64-linux-gnu-ld -o tinyblinky.elf -T memmap tinyblinky.o -m elf32lriscv
+riscv64-linux-gnu-objdump -Mnumeric -D tinyblinky.elf > tinyblinky.list
+riscv64-linux-gnu-objcopy tinyblinky.elf tinyblinky.bin -O binary
+
+ls -l *.bin
+md5sum *.bin
+
+hexdump -ve '1/4 "%08X\n"' tinyblinky.bin > tinyblinky.hex
