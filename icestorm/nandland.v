@@ -4,7 +4,7 @@
 `include "femtorv32_quark.v"
 `include "uart.v"
 `include "ringoscillator.v"
-`include "simple_480p.v"
+`include "simple_480p_regs.v"
 
 module top(input oscillator,
            output TXD,
@@ -115,35 +115,33 @@ module top(input oscillator,
    wire [9:0] ypos;
    wire vga_enable, hsync, vsync;
 
-   simple_480p syncgenerator (clk, ~resetq, xpos, ypos, hsync, vsync, vga_enable);
+   simple_480p_regs syncgenerator (clk, ~resetq, xpos, ypos, hsync, vsync, vga_enable);
 
-   reg  hsync_d1,  hsync_d2,  hsync_d3;
-   reg  vsync_d1,  vsync_d2,  vsync_d3;
-   reg enable_d1, enable_d2, enable_d3;
+   reg  hsync_d1,  hsync_d2;
+   reg  vsync_d1,  vsync_d2;
+   reg enable_d1, enable_d2;
 
    always @(posedge clk)
    begin
      // The pixel pipeline needs three clock cycles to provide bitmap data after
-     // the coordinates are valid. Delay the other VGA signals for three cycles to get in sync.
+     // the coordinates are valid, but the signals arrive one cycle after coordinates
+     // are valid. Delay the VGA signals for two additional cycles to get in sync.
 
      hsync_d1 <= hsync;
      hsync_d2 <= hsync_d1;
-     hsync_d3 <= hsync_d2;
 
      vsync_d1 <= vsync;
      vsync_d2 <= vsync_d1;
-     vsync_d3 <= vsync_d2;
 
      enable_d1 <= vga_enable;
      enable_d2 <= enable_d1;
-     enable_d3 <= enable_d2;
 
-     VGA_HSync <= hsync_d3;
-     VGA_VSync <= vsync_d3;
+     VGA_HSync <= hsync_d2;
+     VGA_VSync <= vsync_d2;
 
      {VGA_Red_2, VGA_Red_1, VGA_Red_0,
       VGA_Grn_2, VGA_Grn_1, VGA_Grn_0,              // Black (required by VGA during blanking)
-      VGA_Blu_2, VGA_Blu_1, VGA_Blu_0} <= ~enable_d3 ? 9'b000_000_000 :
+      VGA_Blu_2, VGA_Blu_1, VGA_Blu_0} <= ~enable_d2 ? 9'b000_000_000 :
                                                     // Cyan (highlight)  Orange (normal)  Navy background
                        bitmap_shift[7] ? colorswitch ? 9'b000_111_111 :  9'b111_101_000 : 9'b000_000_011;
    end
