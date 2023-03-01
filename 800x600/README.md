@@ -6,14 +6,14 @@ Changes relative to the vanilla 640x480 version:
 
   - Clock doubler to 50 MHz
   - VGA 800x600 textmode with 7-Bit ASCII 8x16 font
-  - 1 kb initialised RAM
+  - 2 kb initialised RAM
 
 Memory map and IO
 ---------------------
 
 Memory areas are selected using bits [15:14].
 
-* 0x0000 - 0x03FF: 1 kb initialised RAM for firmware
+* 0x0000 - 0x07FF: 2 kb initialised RAM for firmware
 * 0x4000 - 0x7FFF: Peripheral IO registers
 * 0x8000 - 0x8E0F: 3600 bytes character buffer, 100x36=3600 chars visible, byte access only
 * 0x8E10 - 0x93FF: 1520 bytes font data, 95 characters, 16 bytes per character, byte access only
