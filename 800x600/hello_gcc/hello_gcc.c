@@ -9,8 +9,8 @@
 //   Timing
 // -----------------------------------------------------------------------------
 
-#define CYCLES_US    25
-#define CYCLES_MS 25000
+#define CYCLES_US    50
+#define CYCLES_MS 50000
 
 uint32_t cycles(void)
 {
@@ -247,13 +247,15 @@ void main(void)
   normal();
   putchar(10);
 
-  // A little bit of artwork, does not fit in memory together with the terminal...
+  // A little bit of artwork
 
-  // while (1)
-  // {
-  //   characters[((random() & 15) + 7) * XRES + (random() & 63) + 8] = (random() & 0x80) | (random() & 1 ? 0x2F : 0x5C);
-  //   ms(10);
-  // }
+  while (~keypressed())
+  {
+    characters[((random() & 15) + 7) * XRES + (random() & 63) + 16] = (random() & 0x80) | (random() & 1 ? 0x2F : 0x5C);
+    ms(10);
+  }
+
+  for (uint32_t pos = 4*XRES; pos < YRES*XRES; pos++) characters[pos] = 32;
 
   // Serial terminal on VGA
 

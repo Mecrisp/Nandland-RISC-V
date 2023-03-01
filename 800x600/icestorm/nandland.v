@@ -2,7 +2,7 @@
 `default_nettype none
 
 `include "delayline.v"
-`include "femtorv32_quark.v"
+`include "femtorv32_quark_singlereg.v"
 `include "uart.v"
 `include "ringoscillator.v"
 `include "simple_600p_regs.v"
@@ -358,19 +358,19 @@ your 2xCLK high time.
    // RAM.
    /***************************************************************************/
 
-   reg  [31:0] RAM[(1*1024/4)-1:0]; // Choose your firmware here:
+   reg  [31:0] RAM[(2*1024/4)-1:0]; // Choose your firmware here:
    // initial $readmemh("tinyblinky.hex", RAM);
       initial $readmemh("hello_gcc.hex",  RAM);
    reg  [31:0] ram_rdata;
 
    always @(posedge clk) begin
 
-     if(mem_wmask[0] & mem_address_is_ram) RAM[mem_address[9:2]][ 7:0 ] <= mem_wdata[ 7:0 ];
-     if(mem_wmask[1] & mem_address_is_ram) RAM[mem_address[9:2]][15:8 ] <= mem_wdata[15:8 ];
-     if(mem_wmask[2] & mem_address_is_ram) RAM[mem_address[9:2]][23:16] <= mem_wdata[23:16];
-     if(mem_wmask[3] & mem_address_is_ram) RAM[mem_address[9:2]][31:24] <= mem_wdata[31:24];
+     if(mem_wmask[0] & mem_address_is_ram) RAM[mem_address[10:2]][ 7:0 ] <= mem_wdata[ 7:0 ];
+     if(mem_wmask[1] & mem_address_is_ram) RAM[mem_address[10:2]][15:8 ] <= mem_wdata[15:8 ];
+     if(mem_wmask[2] & mem_address_is_ram) RAM[mem_address[10:2]][23:16] <= mem_wdata[23:16];
+     if(mem_wmask[3] & mem_address_is_ram) RAM[mem_address[10:2]][31:24] <= mem_wdata[31:24];
 
-     ram_rdata <= RAM[mem_address[9:2]];
+     ram_rdata <= RAM[mem_address[10:2]];
    end
 
    /***************************************************************************/
