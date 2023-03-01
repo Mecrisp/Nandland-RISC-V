@@ -155,12 +155,14 @@ module top(input oscillator,
    wire [12:0] characterindex = xpos[2:0] == 3'b000 ? xpos[9:3] + 80 * ypos[9:4] :
                                 xpos[2:0] == 3'b001 ? {char[6:0], ypos[3:0]}  + 12'd2560 - 12'd32*16 :
                                 mem_address[12:0];
+   reg char_rbusy;
 
    always @(posedge clk) // Pixel pipeline.
    begin
       // First & second cycle:
       char    <= characters[ characterindex ]; // First cycle: 7-Bit ASCII. Using char[7] for highlight color.
                                               // Second cycle: 8x16 pixel font bitmap data.
+      char_rbusy <= xpos[2:1] == 2'b00;
 
       // Second cycle:
       colorswitch_delay <= char[7];
@@ -289,7 +291,7 @@ module top(input oscillator,
    // Wait for character data read being possible.
    // This is just the smallest possible logic that works, not the fastest.
 
-   assign mem_rbusy = mem_address[15] & (xpos[2:0] != 3'b011);
+   assign mem_rbusy = mem_address[15] & char_rbusy;
    assign mem_wbusy = 0;
 
    /***************************************************************************/
