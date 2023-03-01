@@ -65,6 +65,10 @@ Tinyblinky:
 
   A little blinky in RISC-V assembler. A nice "hello world" project.
 
+Mandelbrot:
+
+  Explore the Mandelbrot and Tricorn fractals in ASCII art.
+
 Hello GCC:
 
   A small project in C featuring serial terminal, buttons, LEDs and VGA.

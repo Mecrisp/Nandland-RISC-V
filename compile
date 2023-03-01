@@ -6,12 +6,17 @@ cd tinyblinky
 ./assemble
 cd ..
 
+cd mandelbrot
+./assemble
+cd ..
+
 cd hello_gcc
 ./compile
 cd ..
 
 cp tinyblinky/tinyblinky.hex icestorm/tinyblinky.hex
 cp hello_gcc/hello_gcc.hex   icestorm/hello_gcc.hex
+cp mandelbrot/mandelbrot.hex icestorm/mandelbrot.hex
 
 mkdir -p build
 rm -f build/*

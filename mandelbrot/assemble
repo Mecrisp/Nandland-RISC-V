@@ -1,0 +1,11 @@
+#!/bin/sh
+
+riscv64-linux-gnu-as mandelbrot.s -o mandelbrot.o -march=rv32i
+riscv64-linux-gnu-ld -o mandelbrot.elf -T memmap mandelbrot.o -m elf32lriscv
+riscv64-linux-gnu-objdump -Mnumeric -D mandelbrot.elf > mandelbrot.list
+riscv64-linux-gnu-objcopy mandelbrot.elf mandelbrot.bin -O binary
+
+ls -l *.bin
+md5sum *.bin
+
+hexdump -ve '1/4 "%08X\n"' mandelbrot.bin > mandelbrot.hex

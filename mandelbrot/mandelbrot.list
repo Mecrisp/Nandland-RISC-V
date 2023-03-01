@@ -1,0 +1,176 @@
+
+mandelbrot.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00000000 <Reset>:
+   0:	80000213          	li	x4,-2048
+   4:	00000293          	li	x5,0
+   8:	11100313          	li	x6,273
+   c:	00000493          	li	x9,0
+
+00000010 <fractal>:
+  10:	00008937          	lui	x18,0x8
+  14:	fe400413          	li	x8,-28
+  18:	00030a13          	mv	x20,x6
+  1c:	00040a93          	mv	x21,x8
+  20:	00000793          	li	x15,0
+  24:	001a7b13          	andi	x22,x20,1
+  28:	000b0463          	beqz	x22,30 <fractal+0x20>
+  2c:	015787b3          	add	x15,x15,x21
+  30:	001a9a93          	slli	x21,x21,0x1
+  34:	001a5a13          	srli	x20,x20,0x1
+  38:	fe0a16e3          	bnez	x20,24 <fractal+0x14>
+  3c:	005787b3          	add	x15,x15,x5
+  40:	00000893          	li	x17,0
+
+00000044 <y_loop>:
+  44:	fd800413          	li	x8,-40
+  48:	00030a13          	mv	x20,x6
+  4c:	00040a93          	mv	x21,x8
+  50:	00000713          	li	x14,0
+  54:	001a7b13          	andi	x22,x20,1
+  58:	000b0463          	beqz	x22,60 <y_loop+0x1c>
+  5c:	01570733          	add	x14,x14,x21
+  60:	001a9a93          	slli	x21,x21,0x1
+  64:	001a5a13          	srli	x20,x20,0x1
+  68:	fe0a16e3          	bnez	x20,54 <y_loop+0x10>
+  6c:	00470733          	add	x14,x14,x4
+  70:	00000813          	li	x16,0
+
+00000074 <x_loop>:
+  74:	00070513          	mv	x10,x14
+  78:	00078593          	mv	x11,x15
+  7c:	01000613          	li	x12,16
+
+00000080 <iteration_loop>:
+  80:	00058413          	mv	x8,x11
+  84:	00040a13          	mv	x20,x8
+  88:	00058a93          	mv	x21,x11
+  8c:	00000413          	li	x8,0
+  90:	001a7b13          	andi	x22,x20,1
+  94:	000b0463          	beqz	x22,9c <iteration_loop+0x1c>
+  98:	01540433          	add	x8,x8,x21
+  9c:	001a9a93          	slli	x21,x21,0x1
+  a0:	001a5a13          	srli	x20,x20,0x1
+  a4:	fe0a16e3          	bnez	x20,90 <iteration_loop+0x10>
+  a8:	00058a13          	mv	x20,x11
+  ac:	00050a93          	mv	x21,x10
+  b0:	00000593          	li	x11,0
+  b4:	001a7b13          	andi	x22,x20,1
+  b8:	000b0463          	beqz	x22,c0 <iteration_loop+0x40>
+  bc:	015585b3          	add	x11,x11,x21
+  c0:	001a9a93          	slli	x21,x21,0x1
+  c4:	001a5a13          	srli	x20,x20,0x1
+  c8:	fe0a16e3          	bnez	x20,b4 <iteration_loop+0x34>
+  cc:	00050a13          	mv	x20,x10
+  d0:	00050a93          	mv	x21,x10
+  d4:	00000513          	li	x10,0
+  d8:	001a7b13          	andi	x22,x20,1
+  dc:	000b0463          	beqz	x22,e4 <iteration_loop+0x64>
+  e0:	01550533          	add	x10,x10,x21
+  e4:	001a9a93          	slli	x21,x21,0x1
+  e8:	001a5a13          	srli	x20,x20,0x1
+  ec:	fe0a16e3          	bnez	x20,d8 <iteration_loop+0x58>
+  f0:	40850533          	sub	x10,x10,x8
+  f4:	00840433          	add	x8,x8,x8
+  f8:	00a40433          	add	x8,x8,x10
+  fc:	01a45413          	srli	x8,x8,0x1a
+ 100:	02041263          	bnez	x8,124 <iteration_finished>
+ 104:	40c55513          	srai	x10,x10,0xc
+ 108:	40b5d593          	srai	x11,x11,0xb
+ 10c:	00048463          	beqz	x9,114 <iteration_loop+0x94>
+ 110:	40b005b3          	neg	x11,x11
+ 114:	00e50533          	add	x10,x10,x14
+ 118:	00f585b3          	add	x11,x11,x15
+ 11c:	fff60613          	addi	x12,x12,-1
+ 120:	f60610e3          	bnez	x12,80 <iteration_loop>
+
+00000124 <iteration_finished>:
+ 124:	00f67613          	andi	x12,x12,15
+ 128:	00000417          	auipc	x8,0x0
+ 12c:	13040413          	addi	x8,x8,304 # 258 <colormap>
+ 130:	00c40433          	add	x8,x8,x12
+ 134:	00040403          	lb	x8,0(x8)
+ 138:	0804f693          	andi	x13,x9,128
+ 13c:	00d46433          	or	x8,x8,x13
+ 140:	00890023          	sb	x8,0(x18) # 8000 <characters>
+ 144:	00190913          	addi	x18,x18,1
+ 148:	00670733          	add	x14,x14,x6
+ 14c:	00180813          	addi	x16,x16,1
+ 150:	05000693          	li	x13,80
+ 154:	f2d810e3          	bne	x16,x13,74 <x_loop>
+ 158:	006787b3          	add	x15,x15,x6
+ 15c:	006787b3          	add	x15,x15,x6
+ 160:	00188893          	addi	x17,x17,1
+ 164:	01e00693          	li	x13,30
+ 168:	ecd89ee3          	bne	x17,x13,44 <y_loop>
+ 16c:	00004437          	lui	x8,0x4
+ 170:	02040413          	addi	x8,x8,32 # 4020 <buttons>
+ 174:	00042403          	lw	x8,0(x8)
+ 178:	00845413          	srli	x8,x8,0x8
+ 17c:	000046b7          	lui	x13,0x4
+ 180:	00468693          	addi	x13,x13,4 # 4004 <leds>
+ 184:	00e41413          	slli	x8,x8,0xe
+ 188:	0086a023          	sw	x8,0(x13)
+ 18c:	00e45413          	srli	x8,x8,0xe
+ 190:	00847693          	andi	x13,x8,8
+ 194:	00068a63          	beqz	x13,1a8 <iteration_finished+0x84>
+ 198:	00620233          	add	x4,x4,x6
+ 19c:	00620233          	add	x4,x4,x6
+ 1a0:	00620233          	add	x4,x4,x6
+ 1a4:	00620233          	add	x4,x4,x6
+ 1a8:	00447693          	andi	x13,x8,4
+ 1ac:	00068a63          	beqz	x13,1c0 <iteration_finished+0x9c>
+ 1b0:	40620233          	sub	x4,x4,x6
+ 1b4:	40620233          	sub	x4,x4,x6
+ 1b8:	40620233          	sub	x4,x4,x6
+ 1bc:	40620233          	sub	x4,x4,x6
+ 1c0:	00147693          	andi	x13,x8,1
+ 1c4:	00068a63          	beqz	x13,1d8 <iteration_finished+0xb4>
+ 1c8:	006282b3          	add	x5,x5,x6
+ 1cc:	006282b3          	add	x5,x5,x6
+ 1d0:	006282b3          	add	x5,x5,x6
+ 1d4:	006282b3          	add	x5,x5,x6
+ 1d8:	00247693          	andi	x13,x8,2
+ 1dc:	00068a63          	beqz	x13,1f0 <iteration_finished+0xcc>
+ 1e0:	406282b3          	sub	x5,x5,x6
+ 1e4:	406282b3          	sub	x5,x5,x6
+ 1e8:	406282b3          	sub	x5,x5,x6
+ 1ec:	406282b3          	sub	x5,x5,x6
+ 1f0:	00347693          	andi	x13,x8,3
+ 1f4:	ffd68693          	addi	x13,x13,-3
+ 1f8:	00069a63          	bnez	x13,20c <iteration_finished+0xe8>
+ 1fc:	02000693          	li	x13,32
+ 200:	00d34663          	blt	x6,x13,20c <iteration_finished+0xe8>
+ 204:	40435693          	srai	x13,x6,0x4
+ 208:	40d30333          	sub	x6,x6,x13
+ 20c:	00c47693          	andi	x13,x8,12
+ 210:	ff468693          	addi	x13,x13,-12
+ 214:	00069a63          	bnez	x13,228 <iteration_finished+0x104>
+ 218:	40000693          	li	x13,1024
+ 21c:	00d35663          	bge	x6,x13,228 <iteration_finished+0x104>
+ 220:	40435693          	srai	x13,x6,0x4
+ 224:	00d30333          	add	x6,x6,x13
+ 228:	00947693          	andi	x13,x8,9
+ 22c:	ff768693          	addi	x13,x13,-9
+ 230:	00069463          	bnez	x13,238 <iteration_finished+0x114>
+ 234:	00000493          	li	x9,0
+ 238:	00647693          	andi	x13,x8,6
+ 23c:	ffa68693          	addi	x13,x13,-6
+ 240:	00069463          	bnez	x13,248 <iteration_finished+0x124>
+ 244:	fff00493          	li	x9,-1
+ 248:	00547693          	andi	x13,x8,5
+ 24c:	ffb68693          	addi	x13,x13,-5
+ 250:	da0688e3          	beqz	x13,0 <Reset>
+ 254:	dbdff06f          	j	10 <fractal>
+
+00000258 <colormap>:
+ 258:	2b20                	fld	f8,80(x14)
+ 25a:	3040                	fld	f8,160(x8)
+ 25c:	6d25384f          	0x6d25384f
+ 260:	766e                	flw	f12,248(x2)
+ 262:	3b2a                	fld	f22,168(x2)
+ 264:	2c3a                	fld	f24,392(x2)
+ 266:	202e                	fld	f0,200(x2)
