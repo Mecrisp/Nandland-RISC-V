@@ -237,7 +237,7 @@ your 2xCLK high time.
 
    buart #(
      .FREQ_MHZ(50),
-     .BAUDS(115300) // Why does the UART receive not work with 115200 baud @ 50 MHz?
+     .BAUDS(115200)
    ) buart (
       .clk(clk),
       .resetq(resetq),

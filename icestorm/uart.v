@@ -79,7 +79,7 @@ module buart (
                    recv_divcnt <= 0;
                end
                1: begin
-                   if (2*recv_divcnt == divider+1) begin
+                   if (recv_divcnt == divider/2+1) begin
                        recv_state <= 2;
                        recv_divcnt <= 0;
                    end
